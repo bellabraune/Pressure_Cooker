@@ -275,3 +275,489 @@ ggplot(kg_plot, aes(x = kindergarten_years)) +
 
 ```
 
+
+# RQ2: Teaching focus on Year 3 objectives
+
+*What effects does a teaching focus on learning objectives aligned with Years 3
+and 4 have on pupils' academic achievement and subsequent educational pathways?*
+
+## Approach in short
+
+The school has selected 15 learning goals that pupils should reach **before**
+they start group 3 (file `Selected_learning_goals.xlsx`, sheet 2). For RQ2 we
+ask: do pupils who mastered more of these goals by the end of kindergarten do
+better in Year 3 and 4?
+
+| Role | Variable | Source file |
+|---|---|---|
+| Predictor | % of the 15 Year 3 goals mastered at the end of kindergarten | `Observaties_groep_1_2.xlsx` |
+| Outcome: achievement | Cito scores in Year 3 (mid and end) and Year 4 (end) for Mathematics, TMT (reading speed) and Spelling | `Cito_UvA_EN.xlsx` |
+| Outcome: falling behind | Cito performance band IV or V (bottom 40% nationally) | `Cito_UvA_EN.xlsx` |
+| Outcome: pathway | Academic support received in Year 3 (remedial teaching, language group, speech therapy) | `Support interventions_care team.xlsx` |
+| Controls | Age at the start of Year 3, cohort (current group) | `Pupils.xlsx` |
+
+The steps below are: (1) select pupils, (2) identify the Year 3 goals,
+(3) clean the observation scores, (4) compute mastery per pupil, (5) build the
+Cito and support outcomes, (6) combine everything into one dataset, and
+(7) analyse it.
+
+## 1. Pupils
+
+We start from the same pupils as RQ1 (`pupil_selection`, groups 3-7). Unlike
+RQ1, pupils who failed the kindergarten checks are **kept**, because repeating
+a year is itself a possible RQ2 outcome.
+
+The files do not share an ID: the pupil file uses `Pupil 002`, the support file
+`Leerling 018` and the maths file just `7`. Pupil **names** are unique in the
+pupil file and appear in every file, so names are used to link the files.
+`str_squish()` removes accidental double or trailing spaces so that names match
+exactly.
+
+```{r rq2 pupils}
+rq2_pupils <- pupil_selection |>
+  mutate(pupil = str_squish(pupil))   # "Anna  Peters " -> "Anna Peters"
+```
+
+## 2. The Year 3 goals
+
+Sheet 2 of `Selected_learning_goals.xlsx` ("Goals before grade one") lists the
+15 goals the school designated as important for a successful start in Year 3.
+Each goal has a code (e.g. `TG11.2_E2`) in the same format as the column
+`Leerpadcode` in the observations, which is how goals and observations are
+linked. The sheet has three title rows above the header, hence `skip = 3`.
+
+Two other options were checked and rejected:
+
+- `Vaktype` has a category "check", but it only covers world orientation,
+  crafts and performing arts, not the Year 3 goals.
+- `Leercode` is a legacy column: it is filled for almost all rows until
+  2021/22 and empty from 2024/25 onwards (the school changed its recording
+  system). It is therefore not used, and it is skipped when importing.
+
+```{r rq2 goals}
+year3_goals <- read_xlsx(here::here("data", "Selected_learning_goals.xlsx"),
+                         sheet = 2, skip = 3) |>
+  select(goal_no = 1, goal = 2, code = 3) |>   # rename the three columns
+  filter(!is.na(code)) |>                      # drop empty rows
+  mutate(code = str_squish(code))
+
+# number of goals, and share of goal codes that appear in the observations
+nrow(year3_goals)
+mean(year3_goals$code %in% observation_selection$Leerpadcode)
+```
+
+All 15 goal codes appear in the observations (share = 1).
+
+## 3. Cleaning the observation scores
+
+Teachers score each goal on a scale of 0-4, which in practice is 0-3. The score
+distribution showed:
+
+- mostly 0, 1, 2 and 3;
+- a few half scores (1.5, 2.5, 3.5), which are kept;
+- 406 scores of 4, which are recoded to 3 (the highest level used in practice);
+- three impossible scores (5 and 22), which are set to missing (`NA`).
+
+```{r rq2 score cleaning}
+obs_rq2 <- observation_selection |>
+  mutate(Leerling = str_squish(Leerling),
+         Score = case_when(Score == 4 ~ 3,          # 4 -> 3
+                           Score > 4  ~ NA_real_,   # 5 and 22 -> missing
+                           TRUE       ~ Score))     # everything else unchanged
+```
+
+## 4. Mastery per pupil (the predictor)
+
+A goal is usually observed several times during kindergarten. We want to know
+where a pupil **ended up** before Year 3, so for each pupil and goal only the
+**most recent** score is kept (`arrange(desc(Datum))` puts the latest date
+first, `slice(1)` keeps that row).
+
+A goal counts as **mastered** when that last score is 3 (the highest level).
+Then, per pupil:
+
+- `n_goals_observed`: how many of the 15 goals were observed at all;
+- `pct_mastered`: mastered goals as a % of all 15 goals (main measure; a goal
+  that was never observed counts as not mastered);
+- `pct_mastered_2`: the same, but with score 2 or higher counting as mastered
+  (robustness check);
+- `pct_of_observed`: mastered goals as a % of the goals that were observed
+  (robustness check for pupils with incomplete records).
+
+```{r rq2 mastery}
+# last score per pupil per Year 3 goal
+last_scores <- obs_rq2 |>
+  filter(Leerpadcode %in% year3_goals$code, !is.na(Score)) |>
+  group_by(Leerling, Leerpadcode) |>
+  arrange(desc(Datum)) |>
+  slice(1) |>
+  ungroup()
+
+# summary per pupil
+mastery <- last_scores |>
+  group_by(Leerling) |>
+  summarise(n_goals_observed = n(),
+            n_mastered       = sum(Score >= 3),
+            n_mastered_2     = sum(Score >= 2)) |>
+  mutate(pct_mastered    = n_mastered   / nrow(year3_goals) * 100,
+         pct_mastered_2  = n_mastered_2 / nrow(year3_goals) * 100,
+         pct_of_observed = n_mastered   / n_goals_observed * 100)
+```
+
+### Table 2 requested by the school
+
+The school asked for: how many goals were designated as important for Year 3,
+what % of these pupils have mastered on average when starting Year 3, and the
+lowest and highest values across pupils.
+
+```{r rq2 table 2}
+mastery |>
+  summarise(n_goals      = nrow(year3_goals),
+            n_pupils     = n(),
+            mean_pct     = mean(pct_mastered),
+            min_pct      = min(pct_mastered),
+            max_pct      = max(pct_mastered),
+            mean_pct_ge2 = mean(pct_mastered_2))
+```
+
+**Interpretation.** On average pupils mastered about two thirds (68%) of the 15
+goals by the start of Year 3, with large differences between pupils (from 13%
+to 100%). With the looser definition (score 2 or higher), the average is 83%.
+
+### How complete are the records per group?
+
+If a pupil's record is incomplete, the main measure underestimates their
+mastery. This table compares the groups.
+
+```{r rq2 completeness}
+mastery |>
+  left_join(rq2_pupils, by = c("Leerling" = "pupil")) |>
+  group_by(curr_year_group) |>
+  summarise(n = n(),
+            mean_goals_observed = mean(n_goals_observed),
+            mean_pct            = mean(pct_mastered),
+            mean_pct_observed   = mean(pct_of_observed))
+```
+
+**Interpretation.** Groups 3-6 have nearly complete records (13.5-14.7 of the
+15 goals observed). Group 7 has on average only about 10 goals observed, and
+their mastery drops from 68% (of observed goals) to 46% (of all goals): the gap
+comes from missing observations, not lower mastery. This matches the RQ1
+finding that their kindergarten records stop in December. **Group 7 is
+therefore excluded from the outcome analysis.**
+
+## 5a. Outcomes: Cito results
+
+The Cito workbook has one sheet per cohort (`CLASS_2028` to `CLASS_2031`). They
+are read in and stacked into one table. Some cleaning is needed:
+
+- **Column names** are made lower case with underscores
+  (`Assessment period` -> `assessment_period`).
+- **`assessment_period`** holds two things, e.g. `"end 2022-2023"`. It is split
+  into `period` (mid/end) and `school_year`.
+- **Which score?** The column `score` is Cito's ability scale: its values match
+  the "Score ranges" sheet and rise from grade to grade, so progress can be
+  computed. The column `ability_score` is a different measure (values 0.5-3.1)
+  and is not used.
+- **Falling behind.** `performance_band` (I-V) compares a pupil with national
+  norms: I is the top 20%, V the bottom 20%. "I+" is treated as I. Band IV or V
+  counts as *behind*. The column `performance_band_value` is inconsistent and
+  is not used.
+- **Tests.** Only Mathematics, TMT (reading speed) and Spelling (non-verbs) are
+  used, because these were tested in Grade 3 in every school year. Reading
+  Comprehension is missing in Grade 3 for two of the four years.
+
+```{r rq2 cito}
+cito <- map_dfr(c("CLASS_2028", "CLASS_2029", "CLASS_2030", "CLASS_2031"),
+                ~ read_xlsx(here::here("data", "Cito_UvA_EN.xlsx"),
+                            sheet = .x, col_types = "text")) |>
+  rename_with(~ .x |> str_to_lower() |> str_replace_all("[^a-z0-9]+", "_") |>
+                str_remove("_$")) |>
+  mutate(name = str_squish(name))
+
+cito_clean <- cito |>
+  separate_wider_delim(assessment_period, delim = " ",
+                       names = c("period", "school_year"),
+                       too_many = "merge") |>
+  mutate(grade_num = parse_number(grade),                 # "Grade 3" -> 3
+         score     = as.numeric(score),
+         band      = str_remove(performance_band, "[+-]"), # "I+" -> "I"
+         behind    = if_else(is.na(band), NA, band %in% c("IV", "V"))) |>
+  filter(test %in% c("Mathematics", "TMT", "Spelling – Non-verbs"))
+
+# check: number of missing scores per test and grade
+cito_clean |> count(test, grade, missing_score = is.na(score))
+```
+
+### Repeaters
+
+A pupil with results for the **same grade in two different school years** has
+repeated that year. This is checked here because repeating is a possible
+pathway outcome.
+
+```{r rq2 repeaters}
+repeaters <- cito_clean |>
+  group_by(name, grade_num) |>
+  summarise(n_years = n_distinct(school_year), .groups = "drop") |>
+  group_by(name) |>
+  summarise(repeated_year = any(n_years > 1))
+
+repeaters |> count(repeated_year)
+```
+
+Only one pupil repeated a year. That is too few to analyse, so repeating is
+reported descriptively but not used as an outcome.
+
+### One row per pupil
+
+The Cito data has one row per pupil per test per moment. For the analysis we
+need one row per pupil, with a column for each test and moment (e.g.
+`score_math_g3_mid` = maths score in the middle of Year 3). `pivot_wider()`
+does this. For the repeater, only the **first attempt** is used
+(`arrange(school_year)` then `slice(1)`), because that reflects the level they
+started Year 3 with.
+
+`math_progress` is the gain in maths from the middle of Year 3 to the end of
+Year 4.
+
+```{r rq2 cito outcomes}
+outcomes <- cito_clean |>
+  filter(grade_num == 3 | (grade_num == 4 & period == "end")) |>
+  group_by(name, test, grade_num, period) |>
+  arrange(school_year) |>
+  slice(1) |>                                   # first attempt only
+  ungroup() |>
+  mutate(moment = paste0("g", grade_num, "_", period),   # e.g. "g3_mid"
+         test   = recode(test, "Mathematics" = "math", "TMT" = "tmt",
+                         "Spelling – Non-verbs" = "spelling")) |>
+  select(name, test, moment, score, behind) |>
+  pivot_wider(names_from = c(test, moment),
+              values_from = c(score, behind)) |>
+  mutate(math_progress = score_math_g4_end - score_math_g3_mid) |>
+  left_join(repeaters, by = "name")
+```
+
+## 5b. Outcomes: support in Year 3
+
+The support file records each referral with the school year (e.g. `2324` =
+2023/24), but not the pupil's group at that time. The group is worked out from
+the current group:
+
+> group at that time = current group - (2026 - start year of that school year)
+
+For example, a pupil now in group 5 was in group 3 in 2024/25.
+
+Choices made:
+
+- Only support that actually **started** is counted (`Started? = Yes`);
+  referrals on the waiting list are not.
+- **Academic support** means remedial teaching, a language group or 1:1 speech
+  therapy. Motor therapy and behaviour support are less related to Year 3
+  readiness.
+- The file covers 2023/24 to 2025/26, so Year 3 support is only known for
+  pupils now in groups 4-6. For them, a pupil **without a record** is assumed
+  to have received **no support**.
+
+```{r rq2 support}
+support <- read_xlsx(here::here("data", "Support interventions_care team.xlsx"),
+                     skip = 1) |>                 # first row is not the header
+  rename_with(~ .x |> str_to_lower() |> str_replace_all("[^a-z0-9]+", "_") |>
+                str_remove("_$")) |>
+  mutate(student_name = str_squish(student_name))
+
+academic_types <- c("Remedial teaching", "Language group", "1:1 speech therapy")
+
+support_y3 <- support |>
+  filter(!is.na(student_name), !is.na(school_yr), started == "Yes") |>
+  inner_join(rq2_pupils |> select(pupil, curr_year_group),
+             by = c("student_name" = "pupil")) |>
+  mutate(start_year    = 2000 + school_yr %/% 100,   # 2324 -> 2023
+         group_at_time = curr_year_group - (2026 - start_year)) |>
+  filter(group_at_time == 3) |>                      # support in Year 3 only
+  group_by(student_name) |>
+  summarise(n_support_y3          = n(),
+            n_academic_support_y3 = sum(support_type %in% academic_types))
+```
+
+## 6. Analysis dataset
+
+Everything is joined into one table with **one row per pupil** in groups 4-6:
+
+- group 3 is left out because they have no Year 3 Cito results yet;
+- group 7 is left out because their kindergarten records are incomplete.
+
+Two control variables are added:
+
+- **age at the start of Year 3** (Year 3 starts on 1 September of
+  2026 - (current group - 3));
+- **winter birthday** (born October-December), a group the school specifically
+  asked about.
+
+```{r rq2 analysis data}
+rq2_data <- rq2_pupils |>
+  select(pupil, curr_year_group, birth_date, start_date) |>
+  filter(curr_year_group %in% 4:6) |>
+  left_join(mastery,    by = c("pupil" = "Leerling")) |>
+  left_join(outcomes,   by = c("pupil" = "name")) |>
+  left_join(support_y3, by = c("pupil" = "student_name")) |>
+  mutate(
+    year3_start = make_date(2026 - (curr_year_group - 3), 9, 1),
+    age_year3   = time_length(interval(birth_date, year3_start), "years"),
+    winter_bday = month(birth_date) %in% 10:12,
+    across(c(n_support_y3, n_academic_support_y3), ~ replace_na(.x, 0)),
+    any_academic_support_y3 = n_academic_support_y3 > 0
+  )
+
+# pupils per group
+rq2_data |> count(curr_year_group)
+
+# number of pupils with a value for each variable
+rq2_data |>
+  summarise(across(c(pct_mastered, score_math_g3_mid, score_tmt_g3_mid,
+                     score_spelling_g3_mid, math_progress,
+                     any_academic_support_y3, age_year3),
+                   ~ sum(!is.na(.x)))) |>
+  pivot_longer(everything(), names_to = "variable", values_to = "n_non_missing")
+```
+
+**Interpretation.** The analysis sample has 60 pupils (30 in group 4, 16 in
+group 5, 14 in group 6). Mastery and the Year 3 mid scores are available for
+58-59 of them. `math_progress` is only available for 30 pupils, because
+current group 4 has not taken the end-of-Year-4 test yet.
+
+## 7. Analysis
+
+### 7a. Lower vs higher mastery
+
+As a first, simple comparison, pupils are split at the median of
+`pct_mastered` into a "lower" and a "higher" mastery group.
+
+```{r rq2 descriptives}
+rq2_data <- rq2_data |>
+  mutate(mastery_group = if_else(pct_mastered >= median(pct_mastered, na.rm = TRUE),
+                                 "higher", "lower"))
+
+rq2_data |>
+  filter(!is.na(mastery_group)) |>
+  group_by(mastery_group) |>
+  summarise(n                = n(),
+            mean_mastery     = mean(pct_mastered),
+            math_g3_mid      = mean(score_math_g3_mid, na.rm = TRUE),
+            tmt_g3_mid       = mean(score_tmt_g3_mid, na.rm = TRUE),
+            spelling_g3_mid  = mean(score_spelling_g3_mid, na.rm = TRUE),
+            pct_behind_math  = mean(behind_math_g3_mid, na.rm = TRUE) * 100,
+            pct_behind_tmt   = mean(behind_tmt_g3_mid, na.rm = TRUE) * 100,
+            pct_acad_support = mean(any_academic_support_y3) * 100,
+            math_progress    = mean(math_progress, na.rm = TRUE))
+```
+
+**Interpretation.** Pupils with higher mastery score higher on all three tests
+in the middle of Year 3. They are also much less often behind: in maths,
+roughly 4 in 10 pupils with higher mastery are in band IV/V, compared with
+roughly 8 in 10 pupils with lower mastery.
+
+### 7b. Mastery and Year 3 scores
+
+Each dot is a pupil; the black line is a linear fit with its 95% confidence
+band.
+
+```{r rq2 plots}
+rq2_data |>
+  select(pupil, curr_year_group, pct_mastered,
+         Mathematics = score_math_g3_mid, TMT = score_tmt_g3_mid,
+         Spelling = score_spelling_g3_mid) |>
+  pivot_longer(c(Mathematics, TMT, Spelling), names_to = "test", values_to = "score") |>
+  ggplot(aes(x = pct_mastered, y = score)) +
+  geom_point(aes(colour = factor(curr_year_group))) +
+  geom_smooth(method = "lm", se = TRUE, colour = "black") +
+  facet_wrap(~ test, scales = "free_y") +
+  labs(x = "% of Year 3 goals mastered at end of kindergarten",
+       y = "Cito score, Year 3 mid",
+       colour = "Current group")
+```
+
+### 7c. Regression
+
+A linear regression estimates how much the Year 3 score changes per percentage
+point of mastery, while holding age at the start of Year 3 and cohort constant.
+Cohort (`factor(curr_year_group)`) is included because each group took the
+Year 3 test in a different school year. Pupils with a missing value on any
+variable in a model are left out of that model.
+
+```{r rq2 regression}
+model_math     <- lm(score_math_g3_mid     ~ pct_mastered + age_year3 + factor(curr_year_group), data = rq2_data)
+model_tmt      <- lm(score_tmt_g3_mid      ~ pct_mastered + age_year3 + factor(curr_year_group), data = rq2_data)
+model_spelling <- lm(score_spelling_g3_mid ~ pct_mastered + age_year3 + factor(curr_year_group), data = rq2_data)
+
+summary(model_math)
+summary(model_tmt)
+summary(model_spelling)
+```
+
+**Interpretation.**
+
+- **Mathematics:** each extra 10 percentage points of mastery goes with about
+  11 points higher on the Year 3 mid Cito maths score (b = 1.07 per point,
+  p < .001, n = 57).
+- **Spelling:** about 12 points higher per 10 percentage points (b = 1.21,
+  p = .002, n = 56).
+- **TMT (reading speed):** a positive but not significant relation (b = 0.12,
+  p = .13). TMT differs mainly between cohorts, and a few very high scores
+  influence the line.
+- The models explain about a third of the differences between pupils
+  (R² ≈ .34-.36). Age at the start of Year 3 is negatively related to scores,
+  but not significantly.
+
+### 7d. Robustness checks
+
+Do the maths results depend on the choices made above? Three checks:
+
+1. a looser definition of mastery (score 2 or higher);
+2. mastery as a % of the goals that were actually observed;
+3. leaving out pupils who are far from the regression line (standardised
+   residual larger than 2.5).
+
+For check 3 the model is first refitted on the pupils without missing values,
+so that the residuals line up with the right pupils.
+
+```{r rq2 robustness}
+# 1. looser mastery definition
+summary(lm(score_math_g3_mid ~ pct_mastered_2  + age_year3 + factor(curr_year_group), data = rq2_data))
+
+# 2. % of observed goals
+summary(lm(score_math_g3_mid ~ pct_of_observed + age_year3 + factor(curr_year_group), data = rq2_data))
+
+# 3. without extreme pupils
+rq2_math <- rq2_data |>
+  filter(!is.na(score_math_g3_mid), !is.na(pct_mastered), !is.na(age_year3))
+model_math_cc <- lm(score_math_g3_mid ~ pct_mastered + age_year3 + factor(curr_year_group), data = rq2_math)
+rq2_trim <- rq2_math |> filter(abs(rstandard(model_math_cc)) < 2.5)
+summary(lm(score_math_g3_mid ~ pct_mastered + age_year3 + factor(curr_year_group), data = rq2_trim))
+
+# model diagnostics for the main maths model
+par(mfrow = c(2, 2)); plot(model_math); par(mfrow = c(1, 1))
+```
+
+**Interpretation.** The maths result holds in all three checks: with a looser
+definition of mastery the relation is weaker but still significant (b = 1.40,
+p = .006); as a % of observed goals it is almost identical (b = 1.09,
+p < .001); and without extreme pupils it is the same (b = 1.09, p < .001). The
+diagnostic plots show some right skew in the residuals (a few pupils score much
+higher than predicted), but no influential outliers and roughly constant
+variance.
+
+## Limitations
+
+- **Association, not effect.** Pupils who master more goals may simply be
+  stronger learners; the data cannot separate the effect of teaching from the
+  pupil's own ability.
+- **Mastery, not teaching focus.** All pupils received the same kind of
+  teaching; what varies is how much they mastered. Testing the teaching focus
+  itself would require a comparison between groups that were taught
+  differently (e.g. before and after the school introduced the focus, or
+  between classes 1/2a and 1/2b).
+- **Small sample** (about 60 pupils), from one school.
+- **Linking by name.** Files are linked on pupil names; a spelling difference
+  would cause a pupil to be missed.
+- **Support records.** It is assumed that pupils without a record received no
+  support.
