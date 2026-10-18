@@ -274,6 +274,14 @@ ggplot(kg_plot, aes(x = kindergarten_years)) +
        subtitle = "N = 79") 
 
 ```
+## Final Pupil Sample RQ1 
+```{r}
+rq1_pupils <- kindergarten_checked |>
+  filter(curr_year_group %in% 3:6 & all_checks_ok == TRUE) |>
+  select(-c(days_after_4th_bday:all_checks_ok))
+
+rq1_pupils
+```
 
 
 # RQ2: Teaching focus on Year 3 objectives
