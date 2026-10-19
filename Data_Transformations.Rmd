@@ -232,6 +232,7 @@ kindergarten_checked |>
          first_obs, last_obs, days_after_4th_bday, end_year, expected_end_year,
          check_start, check_last_obs, check_group)
 ```
+
 ## Interpertation
 The table above shows that there are 25 pupils who did not pass the checks. 
 Firstly, of these pupils, 18 are currently in grade 8. These all failed the check
@@ -250,33 +251,6 @@ pupils will also not be included in further analysis. Leaving us with a total
 sample size of N = 79. 
 
 
-```{r}
-# asked claude how to visualise the distribution 
-kg_plot <- kindergarten_checked |>
-  filter(curr_year_group %in% 3:6, all_checks_ok) |>
-  mutate(kindergarten_years = time_length(interval(start_date, make_date(end_year, 9, 1)), "years"))
-
-
-kg_plot |>
-  summarise(n = n(),
-            mean = mean(kindergarten_years),
-            sd = sd(kindergarten_years),
-            min = min(kindergarten_years),
-            median = median(kindergarten_years),
-            max = max(kindergarten_years))
-
-
-ggplot(kg_plot, aes(x = kindergarten_years)) +
-  geom_histogram(binwidth = 1/12, colour = "white", fill =  "#01665e") +
-  labs(x = "Time in kindergarten (years)",
-       y = "Number of pupils",
-       title = "Distribution of time spent in Kindergarten by the selected pupils", 
-       subtitle = "N = 79") 
-
-```
-<<<<<<< HEAD
---------------------------------------------------------------------------------
-=======
 ## Final Pupil Sample RQ1 
 ```{r}
 rq1_pupils <- kindergarten_checked |>
@@ -285,9 +259,27 @@ rq1_pupils <- kindergarten_checked |>
 
 rq1_pupils
 ```
->>>>>>> 91e073543b3365863ecb4804ecc6cdf90ff562d6
 
+## Visualisation 
+```{r}
+rq1_pupils |>
+  summarise(n      = n(),
+            mean   = mean(kindergarten_years),
+            sd     = sd(kindergarten_years),
+            min    = min(kindergarten_years),
+            median = median(kindergarten_years),
+            max    = max(kindergarten_years))
 
+ggplot(rq1_pupils, aes(x = kindergarten_years)) +
+  geom_histogram(binwidth = 1/12, colour = "white", fill = "#01665e") +
+  labs(x = "Time in kindergarten (years)",
+       y = "Number of pupils",
+       title = "Distribution of time spent in Kindergarten by the selected pupils",
+       subtitle = "N = 79")
+
+```
+
+--------------------------------------------------------------------------------
 To operationalize the cognitive, social-emotional and executive development of the pupils, we obtain the scores from the observations from Group1/2 from selected domains. Below are the domains we used to measure each of the three functions. In this analysis, we assume that each objective carries the same weight in measuring the developmental function.
 
 |      *Cognitive*        |   *Social-emotional* |  *Executive development*  |
