@@ -274,7 +274,18 @@ ggplot(kg_plot, aes(x = kindergarten_years)) +
        subtitle = "N = 79") 
 
 ```
+<<<<<<< HEAD
 --------------------------------------------------------------------------------
+=======
+## Final Pupil Sample RQ1 
+```{r}
+rq1_pupils <- kindergarten_checked |>
+  filter(curr_year_group %in% 3:6 & all_checks_ok == TRUE) |>
+  select(-c(days_after_4th_bday:all_checks_ok))
+
+rq1_pupils
+```
+>>>>>>> 91e073543b3365863ecb4804ecc6cdf90ff562d6
 
 
 To operationalize the cognitive, social-emotional and executive development of the pupils, we obtain the scores from the observations from Group1/2 from selected domains. Below are the domains we used to measure each of the three functions. In this analysis, we assume that each objective carries the same weight in measuring the developmental function.
