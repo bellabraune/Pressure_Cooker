@@ -27,6 +27,9 @@ packages <- c(
   "rmarkdown", # knitting the report
   "readxl", # reading excel files
   "lubridate",
+  "lme4",
+  "dplyr",
+  "lmerTest",
   "tidyverse" # readr, dplyr, tidyr, ggplot2, stringr, ... - loaded last
   # so its functions win any name clash with the packages above
 )

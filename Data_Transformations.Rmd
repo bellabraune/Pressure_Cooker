@@ -428,7 +428,7 @@ Firstly, the 79 pupils who pass all checks are saved in a table. The observation
 pupils_ok <- kindergarten_checked |>
   filter(all_checks_ok == TRUE)
 
-observation_selection <- observation_selection |>
+observation_sub_selection <- observation_selection |>
   select(Domein, Leerling, Score, Datum, Periode, Jaargang) |>
   mutate(Score = case_when(
                            Score == 4.0 ~ 3.0,
@@ -465,7 +465,7 @@ observation_selection <- observation_selection |>
            "Taakgerichtheid en zelfstandigheid"
          ))
 
-observation_selection
+observation_sub_selection
 
 ```
 
@@ -473,22 +473,22 @@ We check if there are any missing values in the dataset, and find that 115 value
 
 ```{r}
 #check if any values are NAs = 115 NAs in score
-sum(is.na(observation_selection))
+sum(is.na(observation_sub_selection))
 
 #store rows with NAs in different table
-observation_selection_nas <- observation_selection |>
+observation_selection_nas <- observation_sub_selection |>
   filter(is.na(Score))
 observation_selection_nas
 
 #clean table without NAs
-observation_selection <- observation_selection |>
+observation_sub_selection <- observation_sub_selection |>
   filter(!is.na(Score))
-observation_selection
+observation_sub_selection
 
 #check if removing NAs completely excluded any pupil from the data
 pupils_dropped <- setdiff(
   unique(observation_selection_nas$Leerling),
-  unique(observation_selection$Leerling)
+  unique(observation_sub_selection$Leerling)
 )
 length(pupils_dropped)
 
@@ -498,7 +498,7 @@ We create a column with the development function, in which, each domain will be 
 
 ```{r}
 
-observation_selection <- observation_selection |>
+observation_sub_selection <- observation_sub_selection |>
   mutate(
     development_function = case_when(
       Domein %in% c(
@@ -539,7 +539,7 @@ observation_selection <- observation_selection |>
       TRUE ~ NA_character_
     )
   )
-observation_selection
+observation_sub_selection
 
 ```
 
@@ -550,7 +550,7 @@ Some pupils have observations recorded at different times of the year. By calcul
 ```{r}
 #Calculate the elapsed time since starting kindergarten for every observation
 
-scores_over_time <- observation_selection |>
+scores_over_time <- observation_sub_selection |>
   left_join(
     kindergarten_checked |> select(pupil, start_date),
     by = c("Leerling" = "pupil")
@@ -661,10 +661,6 @@ Finally, we fitted separate mixed-effect models for each function, and adjusted 
 As shown below, the results suggest that all three functions have a statistically significant positive relationship with kindergarten duration (p values where p<0.05). Cognition has the largest estimated increase (0.195 per 6 months), followed by social-emotional (0.171) and executive development (0.150).
 
 ``` {r}
-library(lme4)
-library(dplyr)
-library(lmerTest)
-
 model_results <- function_scores_6_months |>
   filter(!is.na(function_score), !is.na(time_period)) |>
   group_by(development_function) |>
