@@ -51,10 +51,10 @@ and lastly (d) information about these pupils that are now in grade 3 or above.
 Will need to be examined in a similar manner. 
 
 
-# Importing Data 
-Running the code below and loading the data should work if you create a 
-folder named "data" in our repository and copy all the data files into this folder.
-This folder is in .gitignore so will not be uploaded online but will stay in 
+# Data loading/ preprocessing 
+Running the code below and loading the data should work if you went through the 
+steps as described in README.md. The data should be stored in the specified
+folder included in .gitignore, so will not be uploaded online and stay in 
 your local environment. 
 
 
@@ -89,7 +89,7 @@ pupils
 ```
 
 
-### Pupil Selection 
+#### Pupil Selection 
 Firstly, the pupile data provides information about the current group of the
 pupils. As we need information about how these pupils performed in group 3-4,
 pupils currently in the startergroup,  group 1, and group 2, cannot be included
@@ -105,16 +105,13 @@ pupil_selection <- pupils |>
   filter(curr_year_group %in% 3:7)
 
 pupil_selection
-```
 
-```{r store pupil names}
 # store the names of all the pupils currently in grade 3-7 
 pupil_names <- pupil_selection |> pull(pupil)
-
-pupil_names
 ```
 
-## 2. Observations group 1 and 2 
+
+## 2. Observations group 1 and 2
 This data file contains observations from students in group 1 and 2. Firstly, 
 the data is imported in the correct format. Secondly, only the rows containing 
 information of the selected pupils above is retained. After filtering the data, 
@@ -128,7 +125,8 @@ observations_1_2 <- read_xlsx(here::here("data", "Observaties_groep_1_2.xlsx"),
   mutate(Score = as.numeric(Score), Datum = as.Date(Datum)) # convert type 
 ```
 
-
+#### Observation Selection 
+Select only the observations of pupils in our selected sample. 
 ```{r filter selected pupils}
 # only keep data about the pupils as selected above 
 observation_selection <-
@@ -139,7 +137,7 @@ observation_selection
 ```
 
 
-# Time spent in Kindergarten 
+## 3. Time spent in Kindergarten 
 In order to examine how long each pupil stayed in kindergarten, and whether 
 these periods differ enough between pupils to compare between groups, we will 
 need to determine how long each pupil spent in kindergarten.  
@@ -165,7 +163,7 @@ kindergarten_time <- pupil_selection |>
 
 kindergarten_time
 ```
-## Robustness Checks 
+#### Robustness Checks 
 Eyebaling the days spent in kindergarten above indicate there are differences
 in time spent in kindergarten. However, a few assumptions have been made which 
 need to be verified to ensure this is truly representative of their time spent
@@ -237,7 +235,7 @@ kindergarten_checked |>
          check_start, check_last_obs, check_group)
 ```
 
-## Interpertation Robustness checks 
+#### Interpertation Robustness checks 
 The table above shows that there are 25 pupils who did not pass the checks. 
 Firstly, of these pupils, 18 are currently in grade 8. These all failed the check
 verifying whether the last observation in grade 1/2 was in July or August. The
@@ -275,7 +273,7 @@ rq1_pupils <- rq1_pupils |>
 
 
 
-## Visualisation 
+#### Distribution of time spent in kindergarten
 ```{r frequency distribution kindergarten time}
 rq1_pupils |>
   summarise(n      = n(),
