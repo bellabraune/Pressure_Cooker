@@ -51,7 +51,7 @@ To get a copy of this project on your own computer, as an RStudio project:
    This file has been included in .gitignore so will not be uploaded.
 3. Download the datafiles provided to us by Epos in this folder. 
 4. Run `00-packages.R` to install and load the packages this project uses.
-5. Knit `Final_Group3.Rmd` (the final report). Knitting runs the script above
+5. Knit `Data_Transformations.Rmd` (the final report). Knitting runs the script above
    for you.
 If the steps described above have all been carried out the html should render 
 and all the data transformations in the .rmd file should run without errors. 
