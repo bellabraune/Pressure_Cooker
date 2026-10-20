@@ -1,0 +1,460 @@
+To operationalize the cognitive, social-emotional and executive development of the pupils, we obtain the scores from the observations from Group1/2 from selected domains. Below are the domains we used to measure each of the three functions. In this analysis, we assume that each objective carries the same weight in measuring the developmental function.
+
+|      *Cognitive*        |   *Social-emotional* |  *Executive development*  |
+|:-----------------------:|:--------------------:|:-------------------------:|
+|Auditory development     |Society               |Balancing                  |
+|Numbers                  |Emotional competencies|Engagement                 |
+|Interactive language use |Empathy               |Emotional competencies     |
+|Knowledge                |Self and others       |Impulse control            |
+|Process                  |The space around you  |Moral competencies         |
+|Play                     |Social initiative     |Task focus and independence|
+|Playing                  |Social autonomy       |                           |
+|Counting and number sense|Social competencies   |                           |
+|Counting and numbers     |Social flexibility    |                           |
+|Visual development       |Rough-and-tumble play |                           |
+|                         |Well-being            |                           |
+
+Firstly, the 79 pupils who pass all checks are saved in a table. The observations file is imported in the correct format, this time to extract the domain information from it. Only the rows with observations from the selected pupils are retained. Scores are re-coded to values from 0-3.
+
+```{r}
+#store the 79 pupils who pass all checks
+pupils_ok <- kindergarten_checked |>
+  filter(all_checks_ok == TRUE)
+
+observation_selection <- observation_selection |>
+  select(Domein, Leerling, Score, Datum, Periode, Jaargang) |>
+  mutate(Score = case_when(
+                           Score == 4.0 ~ 3.0,
+                           Score == 2.5 ~ 2,
+                           TRUE ~ Score)) |>
+  filter(Leerling %in% pupils_ok$pupil,
+         Score != 32.0,
+         Domein %in% c(
+           "Auditieve ontwikkeling",
+           "Balanceren",
+           "Getallen",
+           "Impulsbeheersing",
+           "Interactief taalgebruik",
+           "Kennis",
+           "Proces",
+           "Spel",
+           "Spelen",
+           "Tellen en getalbegrip",
+           "Tellen en getallen",
+           "Visuele ontwikkeling",
+           "De samenleving",
+           "Emotionele competenties",
+           "Inlevingsvermogen",
+           "Jezelf en de ander",
+           "Ruimte om je heen",
+           "Sociaal initiatief",
+           "Sociale autonomie",
+           "Sociale competenties",
+           "Sociale flexibiliteit",
+           "Stoeispelen",
+           "Welbevinden",
+           "Betrokkenheid",
+           "Morele competenties",
+           "Taakgerichtheid en zelfstandigheid"
+         ))
+
+observation_selection
+
+```
+
+We check if there are any missing values in the dataset, and find that 115 values are missing from Scores. As previously, these rows will not be included in the analysis to maintain reliability and consistency. However, we check if removing these rows led to dropping any pupils altogether, and we find that this is not the case.
+
+```{r}
+#check if any values are NAs = 115 NAs in score
+sum(is.na(observation_selection))
+
+#store rows with NAs in different table
+observation_selection_nas <- observation_selection |>
+  filter(is.na(Score))
+observation_selection_nas
+
+#clean table without NAs
+observation_selection <- observation_selection |>
+  filter(!is.na(Score))
+observation_selection
+
+#check if removing NAs completely excluded any pupil from the data
+pupils_dropped <- setdiff(
+  unique(observation_selection_nas$Leerling),
+  unique(observation_selection$Leerling)
+)
+length(pupils_dropped)
+
+```
+
+We create a column with the development function, in which, each domain will be identified with their respective label of the three functions it belongs to (cognitive, social-emotional, executive).
+
+```{r}
+
+observation_selection <- observation_selection |>
+  mutate(
+    development_function = case_when(
+      Domein %in% c(
+        "Auditieve ontwikkeling",
+        "Getallen",
+        "Kennis",
+        "Proces",
+        "Spel",
+        "Spelen",
+        "Tellen en getalbegrip",
+        "Tellen en getallen",
+        "Visuele ontwikkeling"
+      ) ~ "Cognitive",
+
+      Domein %in% c(
+        "De samenleving",
+        "Inlevingsvermogen",
+        "Interactief taalgebruik",
+        "Jezelf en de ander",
+        "Ruimte om je heen",
+        "Sociaal initiatief",
+        "Sociale autonomie",
+        "Sociale competenties",
+        "Sociale flexibiliteit",
+        "Stoeispelen",
+        "Welbevinden"
+      ) ~ "Social-emotional",
+
+      Domein %in% c(
+        "Balanceren",
+        "Betrokkenheid",
+        "Emotionele competenties",
+        "Impulsbeheersing",
+        "Morele competenties",
+        "Taakgerichtheid en zelfstandigheid"
+      ) ~ "Executive",
+
+      TRUE ~ NA_character_
+    )
+  )
+observation_selection
+
+```
+
+First, we calculate the elapsed time and six-month interval for every observation.
+
+Some pupils have observations recorded at different times of the year. By calculating the elapsed time relative to each pupil's own start date, we will be able to align the observations by 'time spent in kindergarten', rather than by calendar year.
+
+```{r}
+#Calculate the elapsed time since starting kindergarten for every observation
+
+scores_over_time <- observation_selection |>
+  left_join(
+    kindergarten_checked |> select(pupil, start_date),
+    by = c("Leerling" = "pupil")
+  ) |>
+  mutate(
+    time_in_kindergarten = as.numeric(Datum - start_date) / 365.25,
+    time_period = floor(time_in_kindergarten * 2) / 2
+  )
+scores_over_time
+```
+
+We calculate the average score for each objective, per pupil, per six-month interval. We group observations into six month intervals, to calculate comparable average scores for each pupil and developmental function at successive stages in their kindergarten time.
+
+Then, we calculate the average of the objectives scores per developmental function. We use the average of the objective scores to ensure that each objective received equal weight. 'n_domain' records the number of objectives contributing to each function score. We can then investigate if recorded scores tend to improve as time in kindergarten increases.
+
+```{r}
+
+# Average score per objective, per pupil, per six-month interval
+domain_scores_6_months <- scores_over_time |>
+  group_by(Leerling, time_period, development_function, Domein) |>
+  summarise(
+    domain_score = mean(Score, na.rm = TRUE),
+    n_observations = n(),
+    .groups = "drop"
+  )
+domain_scores_6_months
+
+# Average objective scores per developmental function
+function_scores_6_months <- domain_scores_6_months |>
+  filter(!is.na(development_function)) |>
+  group_by(Leerling, time_period, development_function) |>
+  summarise(
+    function_score = mean(domain_score, na.rm = TRUE),
+    n_domain = n(),
+    .groups = "drop"
+  )
+function_scores_6_months
+
+```
+The plot below addresses the question "How do developmental function scores tend to change as the time since kindergarten entry increases?"
+
+Each thin, grey line represents one pupil, showing for each function how average scores change across every 6 months spent in kindergarten. The blue trend line reflects the overall relationship between time spent in kindergarten and the recorded scores for each function across all pupils. When it rises, the function scores tend to be higher at later intervals (longer period spent in kindergarten).
+
+```{r}
+
+ggplot(
+  function_scores_6_months,
+  aes(x = time_period, y = function_score, group = Leerling)
+) +
+  geom_line(alpha = 0.2) +
+  geom_smooth(
+    aes(group = 1),
+    method = "loess",
+    se = TRUE,
+    colour = "blue"
+  ) +
+  facet_wrap(~ development_function, ncol = 1) +
+  scale_x_continuous(breaks = seq(0, 4, by = 0.5)) +
+  labs(
+    x = "Years since starting kindergarten",
+    y = "Average developmental score",
+    title = "Developmental scores over time in kindergarten"
+  ) +
+  theme_minimal()
+
+```
+We calculate the mean, standard deviation and the number of pupils contributing to each time period for each function, to see whether scores improve overtime. 
+
+```{r}
+interval_summary <- function_scores_6_months |>
+  group_by(time_period, development_function) |>
+  summarise(
+    mean_score = mean(function_score, na.rm = TRUE),
+    sd_score = sd(function_score, na.rm = TRUE),
+    n_pupils = n_distinct(Leerling[!is.na(function_score)]),
+    se = sd_score / sqrt(n_pupils),
+    .groups = "drop"
+  )
+
+interval_summary
+
+```
+
+Next, we visualize how average developmental function scores change over time in kindergarten. Larger points indicate that more pupil observations contributed data.
+
+```{r}
+
+ggplot(
+  interval_summary,
+  aes(x = time_period, y = mean_score)
+) +
+  geom_line(colour = "#62B8F7") +
+  geom_point(aes(size = n_pupils), colour = "#62B8F7") +
+  facet_wrap(~ development_function, ncol = 1) +
+  scale_x_continuous(breaks = seq(0, 4, by = 0.5)) +
+  labs(
+    x = "Years since starting kindergarten",
+    y = "Mean developmental score",
+    size = "Number of pupils",
+    title = "Average developmental scores by time in kindergarten",
+    subtitle = "Error bars show approximate 95% confidence intervals"
+  ) +
+  theme_minimal()
+
+```
+Finally, we fitted separate mixed-effect models for each function, and adjusted the p-values to account for testing multiple functions.
+
+As shown below, the results suggest that all three functions have a statistically significant positive relationship with kindergarten duration (p values where p<0.05). Cognition has the largest estimated increase (0.195 per 6 months), followed by social-emotional (0.171) and executive development (0.150).
+
+``` {r}
+library(lme4)
+library(dplyr)
+library(lmerTest)
+
+model_results <- function_scores_6_months |>
+  filter(!is.na(function_score), !is.na(time_period)) |>
+  group_by(development_function) |>
+  group_modify(~ {
+    model <- lmer(
+      function_score ~ time_period + (1 | Leerling),
+      data = .x
+    )
+
+    tibble(
+      estimate = fixef(model)["time_period"],
+      p_value = summary(model)$coefficients[
+        "time_period", "Pr(>|t|)"
+      ]
+    )
+  }) |>
+  ungroup() |>
+  mutate(
+    p_adjusted = p.adjust(p_value, method = "BH")
+  )
+
+model_results
+
+```
+
+# Conclusion RQ1 - Kindergarten duration and developmental functioning
+
+The above analysis suggests that the three development functions (cognitive, social-emotional and executive development), as measured by pupil's scores in their observations, tend to increase the longer the pupils stay in kindergarten. For every additional 6 months, cognitive function increased by almost 0.2 points, while social-emotional by 0.17 and executive development by 0.15.
+
+The model results showed statistical significance between kindergarten duration and each developmental function, meaning that these relationships are unlikely to be due to random variation alone. 
+
+Overall, the findings show that pupils tend to attain higher developmental scores as their time spent in kindergarten increases. It is not proven that this is a causal relationship.
+
+
+# RQ1 - Kindergarten duration and functioning in Years 3 & 4
+
+To address the second part of the RQ1, which questions how the duration of kindergarten affects functioning in Years 3 & 4, we first look at the cito test scores from these pupils.
+
+Created by Cito (Central Institute for Test Development), these tests measure primary school pupils' academic progress throughout the years and help guide their secondary school placement. Here, we will use these test results to reflect their levels of academic achievement in grades 3 and 4. 
+
+For our analysis, we retain only pupils in Grades 3 and 4 across all cohorts (2028-2031), and restrict the dataset to pupils included in our for kindergarten analysis. We also select only the tests administered in Grades 3 and 4, excluding tests relevant for later grades (Grade 5 and 6) to ensure consistency and comparability across analyses. We also change performance band "I+" to "I" and "V-" to "V", as there was only one value of each in the dataset.
+
+```{r}
+
+cito <- bind_rows(
+  read_excel(here::here("data", "Cito_UvA_EN.xlsx"), sheet = "CLASS_2028"),
+  read_excel(here::here("data", "Cito_UvA_EN.xlsx"), sheet = "CLASS_2029"),
+  read_excel(here::here("data", "Cito_UvA_EN.xlsx"), sheet = "CLASS_2030"),
+  read_excel(here::here("data", "Cito_UvA_EN.xlsx"), sheet = "CLASS_2031")
+) |>
+  select(-"Performance band value", -"Ability score", -"Cohort year") |>
+  mutate(
+    across(c(1:3, 5:6), as.character),
+    across(4, as.numeric),
+    `Performance band` = recode(
+      `Performance band`,
+      "I+" = "I",
+      "V-" = "V"
+    )
+  ) |>
+  filter(
+         Name %in% pupils_ok$pupil,
+         Grade %in% c("Grade 3", "Grade 4"),
+         Test %in% c(
+           "TMT",
+           "Mathematics",
+           "Spelling – Non-verbs",
+           "Reading Comprehension"
+         ))
+
+```
+We must check if the data have any missing values, and especially if any pupils from the kindergarten duration data are not included in the cito data.
+
+```{r}
+
+# Names in function_scores_6_months that are missing from cito data
+missing_students <- setdiff(
+  unique(function_scores_6_months$Leerling),
+  unique(cito$Name)
+)
+
+missing_students
+length(missing_students)
+
+#33 NAs
+sum(is.na(cito))
+
+```
+25 students will be excluded from the analysis linking kindergarten to Cito performance because their Cito scores are unavailable. This reduces the sample size of pupils to 54.
+
+Below we find that 17 cito scores and 16 performance band values are missing. We inspect in which rows these are, and find that all missing performance band values coincide with missing test scores, while one additional test score is missing despite having a performance band value. We therefore remove the rows with missing data and check whether this results in any additional pupils being excluded. We find that this is not the case, the number of excluded pupils remains 25.
+
+```{r}
+#which columns in cito have missing values
+colSums(is.na(cito))
+
+#which rows in score and performance band have missing values
+which(is.na(cito$Score))
+which(is.na(cito$`Performance band`))
+
+#drop rows with missing values
+cito <- drop_na(cito)
+
+#check again if any columns have missing values
+colSums(is.na(cito))
+
+#check if pupils in fuctnions data still match or if more were dropped
+missing_students2 <- setdiff(
+  unique(function_scores_6_months$Leerling),
+  unique(cito$Name)
+)
+missing_students2 #still 25 missing, no new pupils dropped
+length(missing_students2)
+
+```
+We join the Cito data with the kindergarten duration data, matching by pupil's names.
+
+```{r}
+cito_analysis <- cito |>
+  left_join(
+    kindergarten_checked |>
+      select(pupil, kindergarten_years),
+    by = c("Name" = "pupil")
+  )
+
+#check that every pupil in cito has a matched kindergarten duration value
+sum(is.na(cito_analysis$kindergarten_years))
+```
+Dividing kindergarten duration into six-month intervals here results in groups with too few pupils to reliably compare them. Since the average (mean) time in kindergarten is approximately two years, we divide the pupils into two groups: those who spent two years or less in kindergarten, and those who spent more. The groups now allow for a more practical comparison of their cito scores.
+
+```{r}
+mean(cito_analysis$kindergarten_years)
+
+cito_analysis <- cito_analysis |>
+  mutate(
+    duration_group = if_else(
+      kindergarten_years <= 2,
+      "2 years or less",
+      "more than 2 years"
+    )
+  )
+
+cito_analysis |>
+  distinct(Name, duration_group) |>
+  count(duration_group)
+
+```
+Below we calculate the number and percentage of pupils in each performance band to compare the distribution of the bands between the two duration groups.
+
+```{r}
+band_summary <- cito_analysis |>
+  filter(!is.na(`Performance band`)) |>
+  distinct(Name, Test, `Assessment period`, duration_group,
+           `Performance band`) |>
+  group_by(Test, duration_group, `Performance band`) |>
+  summarise(
+    n = n(),
+    .groups = "drop"
+  ) |>
+  group_by(Test, duration_group) |>
+  mutate(
+    percentage = 100 * n / sum(n)
+  ) |>
+  ungroup()
+
+band_summary
+
+```
+
+The plot below compares the distribution of the performance bands per test between pupils who spent two years or less in kindergarten, and those who spent more. The results combine all cohorts and assessment periods together.
+
+```{r}
+
+ggplot(
+  band_summary,
+  aes(
+    x = duration_group,
+    y = percentage,
+    fill = `Performance band`
+  )
+) +
+  geom_col(position = "dodge") +
+  facet_wrap(~ Test) +
+  labs(
+    x = "Kindergarten duration",
+    y = "Percentage of pupils tested",
+    fill = "Performance\nband",
+    title = "Cito performance bands by kindergarten duration",
+    subtitle = "(All cohorts and assessment periods combined)"
+  ) +
+  theme_bw() +
+  theme(
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        strip.background = element_rect(
+          fill = "#EFE2BA"
+        ))
+```
+
+According to the above visualization, spending longer (more than two years) in kindergarten does not have a consistent advantage in functioning in Years 3 & 4 in terms of Cito test scores. Pupils with longer kindergarten periods show higher performance in TMT, and, to a lesser extent, spelling (non-verbs). However, there is no clear advantage in reading comprehension, while mathematics shows a lowered number of pupils in the top-performing band for longer kindergarten periods. These patterns suggest that any associations between kindergarten duration and Cito test performance are likely subject-specific rather than general.
