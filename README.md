@@ -56,14 +56,3 @@ To get a copy of this project on your own computer, as an RStudio project:
 If the steps described above have all been carried out the html should render 
 and all the data transformations in the .rmd file should run without errors. 
 
-
-
-### Sub-question 1: Extended time in kindergarten
-What effects does spending a longer period in kindergarten have on pupils’ cognitive, social-emotional and executive development, and
-on their functioning in Years 3 and 4?
-
-### Sub-question 2: Teaching focus aligned with Years 3 and 4
-What effects does a teaching focus on learning objectives aligned with Years 3 and 4 have on pupils’ academic achievement and subsequent
-educational pathways?
-
-
