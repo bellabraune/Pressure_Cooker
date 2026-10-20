@@ -2175,27 +2175,18 @@ vertical-align: -.125em;
    
   <ul>
   <li><a href="#project-aim" id="toc-project-aim" class="nav-link active" data-scroll-target="#project-aim">Project Aim</a></li>
-  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data">Importing Data</a>
+  <li><a href="#data-preprocessing" id="toc-data-preprocessing" class="nav-link" data-scroll-target="#data-preprocessing">Data Preprocessing</a>
   <ul class="collapse">
-  <li><a href="#pupils" id="toc-pupils" class="nav-link" data-scroll-target="#pupils">1. Pupils</a>
-  <ul class="collapse">
-  <li><a href="#pupil-selection" id="toc-pupil-selection" class="nav-link" data-scroll-target="#pupil-selection">Pupil Selection</a></li>
-  </ul></li>
+  <li><a href="#pupils" id="toc-pupils" class="nav-link" data-scroll-target="#pupils">1. Pupils</a></li>
   <li><a href="#observations-group-1-and-2" id="toc-observations-group-1-and-2" class="nav-link" data-scroll-target="#observations-group-1-and-2">2. Observations group 1 and 2</a></li>
+  <li><a href="#time-spent-in-kindergarten" id="toc-time-spent-in-kindergarten" class="nav-link" data-scroll-target="#time-spent-in-kindergarten">3. Time spent in Kindergarten</a></li>
   </ul></li>
-  <li><a href="#time-spent-in-kindergarten" id="toc-time-spent-in-kindergarten" class="nav-link" data-scroll-target="#time-spent-in-kindergarten">Time spent in Kindergarten</a>
+  <li><a href="#rq1---kindergarten-duration-and-functioning-in-years-3-4" id="toc-rq1---kindergarten-duration-and-functioning-in-years-3-4" class="nav-link" data-scroll-target="#rq1---kindergarten-duration-and-functioning-in-years-3-4">RQ1 - Kindergarten duration and functioning in Years 3 &amp; 4</a>
   <ul class="collapse">
-  <li><a href="#robustness-checks" id="toc-robustness-checks" class="nav-link" data-scroll-target="#robustness-checks">Robustness Checks</a></li>
-  <li><a href="#interpertation-robustness-checks" id="toc-interpertation-robustness-checks" class="nav-link" data-scroll-target="#interpertation-robustness-checks">Interpertation Robustness checks</a></li>
-  <li><a href="#visualisation" id="toc-visualisation" class="nav-link" data-scroll-target="#visualisation">Visualisation</a></li>
+  <li><a href="#time-spent-in-kindergarten-and-need-for-extra-support" id="toc-time-spent-in-kindergarten-and-need-for-extra-support" class="nav-link" data-scroll-target="#time-spent-in-kindergarten-and-need-for-extra-support">Time spent in Kindergarten and need for extra support</a></li>
+  <li><a href="#development-through-kindergarten" id="toc-development-through-kindergarten" class="nav-link" data-scroll-target="#development-through-kindergarten">Development Through kindergarten</a></li>
+  <li><a href="#time-spent-in-kindergarten-and-functioning-in-years-3-4" id="toc-time-spent-in-kindergarten-and-functioning-in-years-3-4" class="nav-link" data-scroll-target="#time-spent-in-kindergarten-and-functioning-in-years-3-4">Time spent in kindergarten and functioning in Years 3 &amp; 4</a></li>
   </ul></li>
-  <li><a href="#outcome-measure-1-support-interventions" id="toc-outcome-measure-1-support-interventions" class="nav-link" data-scroll-target="#outcome-measure-1-support-interventions">Outcome measure 1: support interventions</a>
-  <ul class="collapse">
-  <li><a href="#select-support-intervention-data-for-pupil-sample" id="toc-select-support-intervention-data-for-pupil-sample" class="nav-link" data-scroll-target="#select-support-intervention-data-for-pupil-sample">1. select support intervention data for pupil sample</a></li>
-  <li><a href="#conclusion-support-interventions" id="toc-conclusion-support-interventions" class="nav-link" data-scroll-target="#conclusion-support-interventions">conclusion support interventions</a></li>
-  </ul></li>
-  <li><a href="#conclusion-rq1---kindergarten-duration-and-developmental-functioning" id="toc-conclusion-rq1---kindergarten-duration-and-developmental-functioning" class="nav-link" data-scroll-target="#conclusion-rq1---kindergarten-duration-and-developmental-functioning">Conclusion RQ1 - Kindergarten duration and developmental functioning</a></li>
-  <li><a href="#rq1---kindergarten-duration-and-functioning-in-years-3-4" id="toc-rq1---kindergarten-duration-and-functioning-in-years-3-4" class="nav-link" data-scroll-target="#rq1---kindergarten-duration-and-functioning-in-years-3-4">RQ1 - Kindergarten duration and functioning in Years 3 &amp; 4</a></li>
   <li><a href="#rq2-teaching-focus-on-year-3-objectives" id="toc-rq2-teaching-focus-on-year-3-objectives" class="nav-link" data-scroll-target="#rq2-teaching-focus-on-year-3-objectives">RQ2: Teaching focus on Year 3 objectives</a>
   <ul class="collapse">
   <li><a href="#approach-in-short" id="toc-approach-in-short" class="nav-link" data-scroll-target="#approach-in-short">Approach in short</a></li>
@@ -2280,9 +2271,9 @@ vertical-align: -.125em;
 <p>In order to examine this question the data will need to contain information pertaining to (a) the amount of years/months children spent in kindergarten, (b) enough variation in terms of how long they spent in kindergarten, to enable a comparison between children who stayed longer, (c) variables that provide information about their cognitive, social-emotional and executive development and lastly (d) information about these pupils that are now in grade 3 or above.</p>
 <p><strong>2.What effects does a teaching focus on learning objectives aligned with</strong> <strong>Years 3 and 4 have on pupils’ academic achievement and subsequent educational</strong> <strong>pathways?</strong> Will need to be examined in a similar manner.</p>
 </section>
-<section id="importing-data" class="level1">
-<h1>Importing Data</h1>
-<p>Running the code below and loading the data should work if you create a folder named “data” in our repository and copy all the data files into this folder. This folder is in .gitignore so will not be uploaded online but will stay in your local environment.</p>
+<section id="data-preprocessing" class="level1">
+<h1>Data Preprocessing</h1>
+<p>Running the code below and loading the data should work if you went through the steps as described in README.md. The data should be stored in the specified folder included in .gitignore, so will not be uploaded online and stay in your local environment.</p>
 <section id="pupils" class="level2">
 <h2 class="anchored" data-anchor-id="pupils">1. Pupils</h2>
 <p>The pupil data is such that each variable is of the correct type and column names do not contain any spaces. - imported such that the dates are of type date. These are now in the format YYYY-mm-dd. The column names have been changed to contain no spaces. old_name = “new_name”</p>
@@ -2312,8 +2303,8 @@ vertical-align: -.125em;
 # ℹ 153 more rows</code></pre>
 </div>
 </div>
-<section id="pupil-selection" class="level3">
-<h3 class="anchored" data-anchor-id="pupil-selection">Pupil Selection</h3>
+<section id="pupil-selection" class="level4">
+<h4 class="anchored" data-anchor-id="pupil-selection">Pupil Selection</h4>
 <p>Firstly, the pupile data provides information about the current group of the pupils. As we need information about how these pupils performed in group 3-4, pupils currently in the startergroup, group 1, and group 2, cannot be included in our analysis. Therefore, pupils currently in group 0, 1, and 2 will be filtered out. After removing these pupils the data set contains 104 entries. The names of these 104 pupils are stored in a vector which will be employed to extract their data from other files.</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -2333,50 +2324,14 @@ vertical-align: -.125em;
 # ℹ 94 more rows</code></pre>
 </div>
 </div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>  [1] &quot;Olivier Van der Meer&quot;  &quot;Maud Van der Linden&quot;   &quot;Jesse Vermeulen&quot;      
-  [4] &quot;Jens Dijkstra&quot;         &quot;Elin Arslan&quot;           &quot;Sophie Peters&quot;        
-  [7] &quot;Evi Kok&quot;               &quot;Max Smits&quot;             &quot;Yara El Idrissi&quot;      
- [10] &quot;Evi Van Wijk&quot;          &quot;Fleur Hendriks&quot;        &quot;Finn Koster&quot;          
- [13] &quot;Timo Ozturk&quot;           &quot;Elif Van Doorn&quot;        &quot;Adam Willems&quot;         
- [16] &quot;Tess Bouazizi&quot;         &quot;Lucas Arslan&quot;          &quot;Mees Yilmaz&quot;          
- [19] &quot;Sam Van Vliet&quot;         &quot;Emma Van der Meer&quot;     &quot;Milan Hassan&quot;         
- [22] &quot;Gijs Karaca&quot;           &quot;Rayan Groen&quot;           &quot;Rayan Bos&quot;            
- [25] &quot;Tess Karaca&quot;           &quot;Noud Kok&quot;              &quot;Luuk Vermeulen&quot;       
- [28] &quot;Aya Van der Ven&quot;       &quot;Julia Van der Heijden&quot; &quot;Roos Benali&quot;          
- [31] &quot;Elif Rahmani&quot;          &quot;Sanne Prins&quot;           &quot;Elif De Groot&quot;        
- [34] &quot;Aya Maas&quot;              &quot;Sophie Maas&quot;           &quot;Youssef Prins&quot;        
- [37] &quot;Lieke Kuipers&quot;         &quot;Leyla Erdogan&quot;         &quot;Amir Van Beek&quot;        
- [40] &quot;Roos Aksoy&quot;            &quot;Jens Van Beek&quot;         &quot;Sanne Dekker&quot;         
- [43] &quot;Sam Groen&quot;             &quot;Jesse Koster&quot;          &quot;Lars Van Wijk&quot;        
- [46] &quot;Luuk Kaya&quot;             &quot;Saar Smit&quot;             &quot;Eva Kok&quot;              
- [49] &quot;Nova Van der Linden&quot;   &quot;Stijn Mulder&quot;          &quot;Thijs De Graaf&quot;       
- [52] &quot;Leyla Jansen&quot;          &quot;Rayan Van der Linden&quot;  &quot;Lars Bakker&quot;          
- [55] &quot;Zeynep De Graaf&quot;       &quot;Ruben Dijkstra&quot;        &quot;Liv El Idrissi&quot;       
- [58] &quot;Roos Jansen&quot;           &quot;Julia Postma&quot;          &quot;Fleur Koster&quot;         
- [61] &quot;Max De Boer&quot;           &quot;Eva Jacobs&quot;            &quot;Evi Kaya&quot;             
- [64] &quot;Mees Erdogan&quot;          &quot;Evi De Bruin&quot;          &quot;Nina Maas&quot;            
- [67] &quot;Mats Van der Ven&quot;      &quot;Stijn Van der Linden&quot;  &quot;Youssef Kok&quot;          
- [70] &quot;Thijs Karaca&quot;          &quot;Jesse Jansen&quot;          &quot;Tess Aydin&quot;           
- [73] &quot;Milan Postma&quot;          &quot;Sanne Van Vliet&quot;       &quot;Wout Van der Linden&quot;  
- [76] &quot;Tess De Wit&quot;           &quot;Olivier Visser&quot;        &quot;Levi Kuipers&quot;         
- [79] &quot;Ilyas Hoekstra&quot;        &quot;Aya Van der Wal&quot;       &quot;Lieke Van Dijk&quot;       
- [82] &quot;Lucas Koster&quot;          &quot;Elin De Bruin&quot;         &quot;Joris Van Leeuwen&quot;    
- [85] &quot;Nova Smit&quot;             &quot;Fleur Postma&quot;          &quot;Eva Aksoy&quot;            
- [88] &quot;Maud Kok&quot;              &quot;Sanne Ait Ali&quot;         &quot;Sam Van den Berg&quot;     
- [91] &quot;Jens Ozturk&quot;           &quot;Anna Peters&quot;           &quot;Yara Aksoy&quot;           
- [94] &quot;Nina El Amrani&quot;        &quot;Aya Bouazizi&quot;          &quot;Ruben Aydin&quot;          
- [97] &quot;Thijs Scholten&quot;        &quot;Thijs Prins&quot;           &quot;Tess Meijer&quot;          
-[100] &quot;Evi Ait Ali&quot;           &quot;Lieke Van Dam&quot;         &quot;Levi Aksoy&quot;           
-[103] &quot;Aya Van Dam&quot;           &quot;Mees Hoekstra&quot;        </code></pre>
-</div>
-</div>
 </section>
 </section>
 <section id="observations-group-1-and-2" class="level2">
 <h2 class="anchored" data-anchor-id="observations-group-1-and-2">2. Observations group 1 and 2</h2>
 <p>This data file contains observations from students in group 1 and 2. Firstly, the data is imported in the correct format. Secondly, only the rows containing information of the selected pupils above is retained. After filtering the data, this file contains 96821 rows.</p>
+<section id="observation-selection" class="level4">
+<h4 class="anchored" data-anchor-id="observation-selection">Observation Selection</h4>
+<p>Select only the observations of pupils in our selected sample.</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 96,821 × 11
@@ -2398,8 +2353,8 @@ vertical-align: -.125em;
 </div>
 </section>
 </section>
-<section id="time-spent-in-kindergarten" class="level1">
-<h1>Time spent in Kindergarten</h1>
+<section id="time-spent-in-kindergarten" class="level2">
+<h2 class="anchored" data-anchor-id="time-spent-in-kindergarten">3. Time spent in Kindergarten</h2>
 <p>In order to examine how long each pupil stayed in kindergarten, and whether these periods differ enough between pupils to compare between groups, we will need to determine how long each pupil spent in kindergarten.</p>
 <p>This could be estimated from the start date of each pupil and the last observation which was made for them in group 1/2. This will not provide a precise estimate but will give us a rough estimation of whether we can proceed.</p>
 <div class="cell">
@@ -2422,8 +2377,8 @@ vertical-align: -.125em;
 #   kindergarten_years &lt;dbl&gt;</code></pre>
 </div>
 </div>
-<section id="robustness-checks" class="level2">
-<h2 class="anchored" data-anchor-id="robustness-checks">Robustness Checks</h2>
+<section id="robustness-checks" class="level4">
+<h4 class="anchored" data-anchor-id="robustness-checks">Robustness Checks</h4>
 <p>Eyebaling the days spent in kindergarten above indicate there are differences in time spent in kindergarten. However, a few assumptions have been made which need to be verified to ensure this is truly representative of their time spent in kindergarten.</p>
 <p>Firstly, the variable start_date has now been interperted as the date at which pupils start school. The following checks will therefore be performed, by computing the number of days between the childs 4th birthday and the start date at school. (a) whether the start_date is after the child’s 4th birthday (flag potential mistakes in the data), (b) the child started school no more than 60 days after their birthday (as this school only accepts children that just turned 4), (c) there are no observations before the start date.</p>
 <p>Secondly, the time spent in kindergarten has now been estimated from the date at which the last observation was made in grade 1/2 of each pupil. However, if these dates differ significanlty or were registered a long time before the summer holiday (July/ August) we cannot infer how long these children spent in kindergarten. Therefore, the second checks verifies whether the last observation was in july or august (and is not missing).</p>
@@ -2457,13 +2412,16 @@ vertical-align: -.125em;
 </div>
 </div>
 </section>
-<section id="interpertation-robustness-checks" class="level2">
-<h2 class="anchored" data-anchor-id="interpertation-robustness-checks">Interpertation Robustness checks</h2>
+<section id="interpertation-robustness-checks" class="level4">
+<h4 class="anchored" data-anchor-id="interpertation-robustness-checks">Interpertation Robustness checks</h4>
 <p>The table above shows that there are 25 pupils who did not pass the checks. Firstly, of these pupils, 18 are currently in grade 8. These all failed the check verifying whether the last observation in grade 1/2 was in July or August. The last observation of these pupils were all recorded in december. So either their observations got lost or were not stored correctly. As we are examining development in grades 3:4, we could remove pupils in grade 7 all together to ensure that each grade is represented by an equal amount of students. Secondly, two pupils from grade 5 failed because of NAs and one because the first observation was before the start_date. To ensure we have reliable information these pupils will also not be included in the analysis. The remaining pupils who failed the checks were in group 3 and 4. One because if NAs and in every other case because the pupils should have left kindergarten a year earlier than their current group implies. This could be explained if these pupils had to redo year 3 or 4. These pupils will also not be included in further analysis. Leaving us with a total sample size of N = 79.</p>
-<p>Below the final sample is stored in rq1_pupils, containing their</p>
 </section>
-<section id="visualisation" class="level2">
-<h2 class="anchored" data-anchor-id="visualisation">Visualisation</h2>
+<section id="final-pupil-sample-rq1" class="level4">
+<h4 class="anchored" data-anchor-id="final-pupil-sample-rq1">Final pupil sample RQ1</h4>
+<p>Based on the computations for time spent in Kindergarten,</p>
+</section>
+<section id="distribution-of-time-spent-in-kindergarten" class="level4">
+<h4 class="anchored" data-anchor-id="distribution-of-time-spent-in-kindergarten">Distribution of time spent in kindergarten</h4>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 6
@@ -2481,14 +2439,17 @@ vertical-align: -.125em;
 </div>
 </section>
 </section>
-<section id="outcome-measure-1-support-interventions" class="level1">
-<h1>Outcome measure 1: support interventions</h1>
+</section>
+<section id="rq1---kindergarten-duration-and-functioning-in-years-3-4" class="level1">
+<h1>RQ1 - Kindergarten duration and functioning in Years 3 &amp; 4</h1>
+<section id="time-spent-in-kindergarten-and-need-for-extra-support" class="level2">
+<h2 class="anchored" data-anchor-id="time-spent-in-kindergarten-and-need-for-extra-support">Time spent in Kindergarten and need for extra support</h2>
 <p>As outlined above, pupils currently in grade 3 till 6, of whom we have observations made in group 1 and 2, and passed all robustness were included in the final sample, resulting in a total sample of 79 students (N).</p>
 <p>To determine which developmental outcomes are associated with time spent in kindergarten we will examine the requested support interventions for the selected pupil sample. The data containing information about the support interventions does not contain information about which grade pupils were in when the requests were made. Therefore, the following steps will be taken before analysis this outcome measure.<br>
 (1) calculating the grade pupils were in when the request was made (2) filtering out the data of our selected sample</p>
 <p>After subselecting the data the following outcomes will be exmained (1) comparison between the number of requested interventions for children who spent an average time in kindergarten (2 years) and those who stayed longer. (2) comparison between the number of support interventions requested and pupils grouped according to how long they spent in kindergarten. (3) examine whetehr a certain need is more common amongst one of these groups</p>
-<section id="select-support-intervention-data-for-pupil-sample" class="level2">
-<h2 class="anchored" data-anchor-id="select-support-intervention-data-for-pupil-sample">1. select support intervention data for pupil sample</h2>
+<section id="selected-sample-support-intervention" class="level4">
+<h4 class="anchored" data-anchor-id="selected-sample-support-intervention">selected sample support intervention</h4>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 27 × 2
@@ -2546,6 +2507,9 @@ vertical-align: -.125em;
 </div>
 </div>
 <p>The table above shows that only the support data of 27 pupils is available to us. This can be explained by the year in which this data was recorded, as it does not include the support requests which were made this school year. Children currently in grade 3 therefore have no support intervention data, thereby limiting our analysis. We will however briefly explore whether certain differences can be observed for these 27 pupils, in terms of their time spent in kindergarten.</p>
+</section>
+<section id="number-of-support-requests-in-each-grade" class="level4">
+<h4 class="anchored" data-anchor-id="number-of-support-requests-in-each-grade">Number of support requests in each grade</h4>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 26 × 12
@@ -2593,9 +2557,13 @@ vertical-align: -.125em;
 </div>
 </div>
 </section>
-<section id="conclusion-support-interventions" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion-support-interventions">conclusion support interventions</h2>
+<section id="conclusion---support-interventions-and-time-spent-in-kindergarten" class="level4">
+<h4 class="anchored" data-anchor-id="conclusion---support-interventions-and-time-spent-in-kindergarten">Conclusion - Support interventions and time spent in kindergarten</h4>
 <p>No differences between children that stayed in kindergarten for a longer period vs 2 years or less are observable.</p>
+</section>
+</section>
+<section id="development-through-kindergarten" class="level2">
+<h2 class="anchored" data-anchor-id="development-through-kindergarten">Development Through kindergarten</h2>
 <p>To operationalize the cognitive, social-emotional and executive development of the pupils, we obtain the scores from the observations from Group1/2 from selected domains. Below are the domains we used to measure each of the three functions. In this analysis, we assume that each objective carries the same weight in measuring the developmental function.</p>
 <table class="caption-top table">
 <colgroup>
@@ -2853,16 +2821,15 @@ vertical-align: -.125em;
 3 Social-emotional        0.342 2.89e-36   4.34e-36</code></pre>
 </div>
 </div>
-</section>
-</section>
-<section id="conclusion-rq1---kindergarten-duration-and-developmental-functioning" class="level1">
-<h1>Conclusion RQ1 - Kindergarten duration and developmental functioning</h1>
+<section id="conclusion---kindergarten-duration-and-developmental-functioning" class="level4">
+<h4 class="anchored" data-anchor-id="conclusion---kindergarten-duration-and-developmental-functioning">Conclusion - Kindergarten duration and developmental functioning</h4>
 <p>The above analysis suggests that the three development functions (cognitive, social-emotional and executive development), as measured by pupil’s scores in their observations, tend to increase the longer the pupils stay in kindergarten. For every additional 6 months, cognitive function increased by almost 0.2 points, while social-emotional by 0.17 and executive development by 0.15.</p>
 <p>The model results showed statistical significance between kindergarten duration and each developmental function, meaning that these relationships are unlikely to be due to random variation alone.</p>
 <p>Overall, the findings show that pupils tend to attain higher developmental scores as their time spent in kindergarten increases. It is not proven that this is a causal relationship.</p>
 </section>
-<section id="rq1---kindergarten-duration-and-functioning-in-years-3-4" class="level1">
-<h1>RQ1 - Kindergarten duration and functioning in Years 3 &amp; 4</h1>
+</section>
+<section id="time-spent-in-kindergarten-and-functioning-in-years-3-4" class="level2">
+<h2 class="anchored" data-anchor-id="time-spent-in-kindergarten-and-functioning-in-years-3-4">Time spent in kindergarten and functioning in Years 3 &amp; 4</h2>
 <p>To address the second part of the RQ1, which questions how the duration of kindergarten affects functioning in Years 3 &amp; 4, we first look at the cito test scores from these pupils.</p>
 <p>Created by Cito (Central Institute for Test Development), these tests measure primary school pupils’ academic progress throughout the years and help guide their secondary school placement. Here, we will use these test results to reflect their levels of academic achievement in grades 3 and 4.</p>
 <p>For our analysis, we retain only pupils in Grades 3 and 4 across all cohorts (2028-2031), and restrict the dataset to pupils included in our for kindergarten analysis. We also select only the tests administered in Grades 3 and 4, excluding tests relevant for later grades (Grade 5 and 6) to ensure consistency and comparability across analyses. We also change performance band “I+” to “I” and “V-” to “V”, as there was only one value of each in the dataset.</p>
@@ -2971,6 +2938,7 @@ vertical-align: -.125em;
 </div>
 </div>
 <p>According to the above visualization, spending longer (more than two years) in kindergarten does not have a consistent advantage in functioning in Years 3 &amp; 4 in terms of Cito test scores. Pupils with longer kindergarten periods show higher performance in TMT, and, to a lesser extent, spelling (non-verbs). However, there is no clear advantage in reading comprehension, while mathematics shows a lowered number of pupils in the top-performing band for longer kindergarten periods. These patterns suggest that any associations between kindergarten duration and Cito test performance are likely subject-specific rather than general.</p>
+</section>
 </section>
 <section id="rq2-teaching-focus-on-year-3-objectives" class="level1">
 <h1>RQ2: Teaching focus on Year 3 objectives</h1>

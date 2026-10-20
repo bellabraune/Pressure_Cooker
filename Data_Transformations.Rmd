@@ -51,7 +51,7 @@ and lastly (d) information about these pupils that are now in grade 3 or above.
 Will need to be examined in a similar manner. 
 
 
-# Data loading/ preprocessing 
+# Data Preprocessing 
 Running the code below and loading the data should work if you went through the 
 steps as described in README.md. The data should be stored in the specified
 folder included in .gitignore, so will not be uploaded online and stay in 
@@ -163,6 +163,7 @@ kindergarten_time <- pupil_selection |>
 
 kindergarten_time
 ```
+
 #### Robustness Checks 
 Eyebaling the days spent in kindergarten above indicate there are differences
 in time spent in kindergarten. However, a few assumptions have been made which 
@@ -253,7 +254,8 @@ pupils will also not be included in further analysis. Leaving us with a total
 sample size of N = 79. 
 
 
-Below the final sample is stored in rq1_pupils, containing their 
+#### Final pupil sample RQ1 
+Based on the computations for time spent in Kindergarten, 
 ```{r final pupil sample rq1}
 rq1_pupils <- kindergarten_checked |>
   filter(curr_year_group %in% 3:6 & all_checks_ok == TRUE) |>
@@ -269,8 +271,6 @@ rq1_pupils <- rq1_pupils |>
   mutate(rounded_kg_years = round(kindergarten_years, 1))
 
 ```
-
-
 
 
 #### Distribution of time spent in kindergarten
@@ -291,9 +291,9 @@ ggplot(rq1_pupils, aes(x = kindergarten_years)) +
        subtitle = "N = 79")
 ```
 
+# RQ1 - Kindergarten duration and functioning in Years 3 & 4
 
-# Outcome measure 1: support interventions 
-
+## Time spent in Kindergarten and need for extra support
 As outlined above, pupils currently in grade 3 till 6, of whom we have 
 observations made in group 1 and 2, and passed all robustness were included in 
 the final sample, resulting in a total sample of 79 students (N). 
@@ -316,8 +316,7 @@ grouped according to how long they spent in kindergarten.
 
 
 
-## 1. select support intervention data for pupil sample 
-
+#### selected sample support intervention
 ```{r}
 # load support interventions dataset 
 support <- read_xlsx(here::here("data", "Support interventions_care team.xlsx"),
@@ -359,7 +358,7 @@ We will however briefly explore whether certain differences can be observed for
 these 27 pupils, in terms of their time spent in kindergarten. 
 
 
-
+#### Number of support requests in each grade 
 ```{r}
 # compute the number of support interventions requested per pupil in each grade 
 support_counts <- rq1_support |> 
@@ -398,11 +397,12 @@ can be drawn from this data.
 rq1_pupils |> 
   filter(curr_year_group == 5)
 ```
-## conclusion support interventions 
+####  Conclusion  - Support interventions and time spent in kindergarten 
 No differences between children that stayed in kindergarten for a longer period 
 vs 2 years or less are observable. 
 
 
+## Development Through kindergarten 
 To operationalize the cognitive, social-emotional and executive development of the pupils, we obtain the scores from the observations from Group1/2 from selected domains. Below are the domains we used to measure each of the three functions. In this analysis, we assume that each objective carries the same weight in measuring the developmental function.
 
 |      *Cognitive*        |   *Social-emotional* |  *Executive development*  |
@@ -684,7 +684,7 @@ model_results
 
 ```
 
-# Conclusion RQ1 - Kindergarten duration and developmental functioning
+#### Conclusion - Kindergarten duration and developmental functioning
 
 The above analysis suggests that the three development functions (cognitive, social-emotional and executive development), as measured by pupil's scores in their observations, tend to increase the longer the pupils stay in kindergarten. For every additional 6 months, cognitive function increased by almost 0.2 points, while social-emotional by 0.17 and executive development by 0.15.
 
@@ -693,7 +693,7 @@ The model results showed statistical significance between kindergarten duration 
 Overall, the findings show that pupils tend to attain higher developmental scores as their time spent in kindergarten increases. It is not proven that this is a causal relationship.
 
 
-# RQ1 - Kindergarten duration and functioning in Years 3 & 4
+## Time spent in kindergarten and functioning in Years 3 & 4
 
 To address the second part of the RQ1, which questions how the duration of kindergarten affects functioning in Years 3 & 4, we first look at the cito test scores from these pupils.
 
