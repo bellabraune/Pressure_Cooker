@@ -283,6 +283,7 @@ ggplot(kg_plot, aes(x = kindergarten_years)) +
 rq1_pupils <- kindergarten_checked |>
   filter(curr_year_group %in% 3:6 & all_checks_ok == TRUE) |>
   select(-c(days_after_4th_bday:all_checks_ok))
+```
 =======
 >>>>>>> b81e53b0b9857473a11e1ac85f7db52ab4f79394
 
